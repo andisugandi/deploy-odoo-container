@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  db:
+    image: 'docker.io/library/postgres:16'
+    restart: always
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=please_choose_your_own_super_secret_password
+      - POSTGRESQL_ADMIN_PASSWORD=please_choose_your_own_super_secret_password
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    networks:
+      - odoo16network
+    volumes:
+      - '/mnt/odoo/postgresql:/var/lib/postgresql/data'
+
+  odoo16:
+    depends_on:
+      - db
+    image: 'docker.io/library/odoo:16'
+    environment:
+      -  HOST=db
+      -  PORT=5432
+      -  USER=odoo
+      -  PASSWORD=please_choose_your_own_super_secret_password
+    restart: always
+    volumes:
+      - '/mnt/odoo/odoo-extra-addons:/mnt/extra-addons'
+      - '/mnt/odoo/odoo-web-data:/var/lib/odoo'
+    ports:
+      - '8069:8069'
+    networks:
+      - odoo16network
+    
+networks:
+  odoo16network:
